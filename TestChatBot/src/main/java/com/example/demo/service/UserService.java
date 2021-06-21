@@ -5,40 +5,37 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 
 import com.example.demo.util.Constants;
+import org.springframework.stereotype.Service;
 
-public class UserService extends CommonService {
+@Service
+public class UserService extends CommonService{
+    public void sendMessage(String msg, String userId){
+        WebDriver webDriver = initDriver();
+        login(webDriver);
+        sleep(1000l);
+        String url = Constants.URL_SEND_MESSAGE + userId;
+        webDriver.get(url);
+        sleep(1000l);
+        webDriver.findElement(By.xpath("//*[@id=\"composerInput\"]")).sendKeys(msg);
+        sleep(2000l);
+        webDriver.findElement(By.xpath("//*[@id=\"composer_form\"]/table/tbody/tr/td[2]/input")).click();
+        sleep(2000l);
+        webDriver.close();
+    }
 
-	public void sendMessage(String msg, String userId) {
-		WebDriver driver = initDriver();
+    public void login(WebDriver webDriver){
+        webDriver.get("https://www.facebook.com/");
+        String title = webDriver.getTitle();
+        if (title.matches("^(\\(.*\\) ){0,1}Facebook$")) {
+            return;
+        }
+        webDriver.findElement(By.xpath("//*[@id=\"email\"]")).sendKeys(Constants.USER_NAME);
+        webDriver.findElement(By.xpath("//*[@id=\"pass\"]")).sendKeys(Constants.PASS);
+        webDriver.findElement(By.xpath("//*[@id=\"pass\"]")).sendKeys(Keys.ENTER);
 
-		login(driver);
-		sleep(1000l);
-		String url = Constants.URL_SEND_MESSAGE + userId;
-		driver.get(url);
-		sleep(1000l);
-
-		driver.findElement(By.xpath(
-				"/html/body/div[1]/div[1]/div[1]/div/div[2]/div/div/div[1]/div[1]/div[2]/div/div/div/div/div/div[1]/div[2]/div/div/div/div[2]/div/form/div/div[3]/div[2]/div[1]/div/div/div/div/div[2]/div/div/div/div"))
-				.sendKeys(msg, Keys.ENTER);
-		sleep(2000l);
-//		driver.findElement(By.xpath(""))
-		driver.close();
-	}
-
-	public void login(WebDriver driver) {
-		driver.get("https://www.messenger.com/login/");
-		String url = driver.getCurrentUrl();
-		if (!url.contains("login")) {
-			return;
-		}
-		driver.findElement(By.xpath("//*[@id=\"email\"]")).sendKeys(Constants.USER_NAME);
-		driver.findElement(By.xpath("//*[@id=\"pass\"]")).sendKeys(Constants.PASS, Keys.ENTER);
-//		driver.findElement(By.xpath("//*[@id=\"pass\"]")).sendKeys(Constants.PASS);
-
-		url = driver.getCurrentUrl();
-		if (!url.contains("login")) {
-			System.out.println("Da Login");
-		}
-
-	}
+        title = webDriver.getTitle();
+        if (title.matches("^(\\(.*\\) ){0,1}Facebook$")) {
+            System.out.println("Da login");
+        }
+    }
 }
